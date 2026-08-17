@@ -14,12 +14,12 @@
   html{scroll-behavior:smooth;}
   body{margin:0; background:var(--cream); color:var(--espresso); font-family:'Work Sans',sans-serif; line-height:1.5;}
 
-  /* AMBIENT GRADIENT — Granim.js, fixed behind all content */
-  #granim-canvas{
+  /* AMBIENT PARTICLES — tsParticles, fixed behind all content */
+  #tsparticles{
     position:fixed; inset:0; width:100vw; height:100vh;
-    z-index:-1; pointer-events:none; opacity:0.65;
+    z-index:-1; pointer-events:none;
   }
-  @media (prefers-reduced-motion: reduce){ #granim-canvas{display:none;} }
+  @media (prefers-reduced-motion: reduce){ #tsparticles{display:none;} }
   h1,h2,h3,.display{font-family:'Fraunces',serif; font-weight:600; letter-spacing:-0.01em; margin:0;}
   .mono{font-family:'Space Mono',monospace;}
   a{color:inherit;}

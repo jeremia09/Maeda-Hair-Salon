@@ -9,28 +9,35 @@
 })();
 
 // Scroll-driven reveal animations (AOS - https://unpkg.com/aos)
-if (window.AOS) {
+// Wrapped in DOMContentLoaded so the CDN script has finished executing
+// before we attempt to call AOS.init() — critical on slow mobile connections.
+document.addEventListener('DOMContentLoaded', function () {
   var reduceMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-  AOS.init({
-    duration: 650,
-    easing: 'ease-out-cubic',
-    once: true,
-    offset: 60,
-    disable: reduceMotion
-  });
-}
 
-// Safety net: if the AOS script fails to load (some mobile networks/
-// browsers block third-party CDN scripts), aos.css still hides
-// [data-aos] elements by default with no JS to ever reveal them.
-// Force everything visible after a short delay if that happens.
-window.setTimeout(function () {
-  if (!window.AOS) {
+  if (reduceMotion) {
+    // Respect the OS setting but still make everything visible —
+    // don't leave elements hidden in their pre-animation opacity:0 state.
+    document.querySelectorAll('[data-aos]').forEach(function (el) {
+      el.removeAttribute('data-aos');
+    });
+    return;
+  }
+
+  if (window.AOS) {
+    AOS.init({
+      duration: 650,
+      easing: 'ease-out-cubic',
+      once: true,
+      offset: 40,           // lower threshold — better for small mobile viewports
+      startEvent: 'DOMContentLoaded'
+    });
+  } else {
+    // AOS CDN script was blocked or too slow — reveal everything immediately.
     document.querySelectorAll('[data-aos]').forEach(function (el) {
       el.removeAttribute('data-aos');
     });
   }
-}, 2000);
+});
 
 // Subtle hero parallax — moves the ticket-stub background slower than
 // the page scroll, bounded card version (not viewport-fixed, since the
@@ -66,46 +73,84 @@ window.setTimeout(function () {
   update();
 })();
 
-// Ambient liquid gradient backdrop (Granim.js - cdnjs.cloudflare.com)
-// Kept within the site's own lavender/purple palette so it reads as
-// "the page breathing," not a mismatched color overlay.
+// Microscopic Floating Minerals — tsParticles v2 (cdn.jsdelivr.net)
+// Hyper-delicate dust motes drifting slowly in sunlight.
+// Vibe: organic wellness, botanical texture, clean and high-end.
 (function () {
-  var canvas = document.getElementById('granim-canvas');
-  if (!canvas) return;
-  if (typeof Granim === 'undefined') {
-    console.warn('Granim.js failed to load from the CDN — ambient gradient skipped.');
-    return;
-  }
   var reduceMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-  if (reduceMotion) {
-    console.info('Ambient gradient skipped: prefers-reduced-motion is on.');
+  if (reduceMotion) return;
+
+  if (typeof tsParticles === 'undefined') {
+    console.warn('tsParticles failed to load from the CDN — ambient particles skipped.');
     return;
   }
 
-  // Set the actual drawing-buffer resolution — without this the canvas
-  // defaults to 300x150px internally and gets blurrily stretched by CSS.
-  function sizeCanvas() {
-    canvas.width = window.innerWidth;
-    canvas.height = window.innerHeight;
-  }
-  sizeCanvas();
-  window.addEventListener('resize', sizeCanvas);
+  // v2 API: tsParticles.load("elementId", options)
+  tsParticles.load('tsparticles', {
+    // Transparent background — the page's own --cream CSS var shows through
+    background: { color: { value: 'transparent' } },
 
-  new Granim({
-    element: '#granim-canvas',
-    direction: 'diagonal',
-    isPausedWhenNotInView: true,
-    states: {
-      'default-state': {
-        gradients: [
-          ['#E4E0F7', '#8479B8'],
-          ['#C6BFEC', '#6C5FA5'],
-          ['#D9CFF0', '#4C4178'],
-          ['#8479B8', '#C6BFEC']
-        ],
-        transitionSpeed: 4500,
-        loop: true
+    fpsLimit: 40,
+
+    particles: {
+      number: {
+        value: 110,
+        density: { enable: true, value_area: 1100 }
+      },
+
+      // Colour palette: soft purples & warm neutrals lifted from the brand
+      color: {
+        value: ['#8479B8', '#6C5FA5', '#4C4178', '#C6BFEC', '#a49ac8']
+      },
+
+      // Round dust motes — vary in size for depth
+      shape: { type: 'circle' },
+
+      opacity: {
+        value: 0.35,
+        random: true,
+        anim: {
+          enable: true,
+          speed: 0.35,
+          opacity_min: 0.05,
+          sync: false
+        }
+      },
+
+      size: {
+        value: 3,
+        random: true,
+        anim: {
+          enable: true,
+          speed: 0.5,
+          size_min: 0.6,
+          sync: false
+        }
+      },
+
+      // Very slow, organic drift — no strong direction
+      move: {
+        enable: true,
+        speed: 0.28,
+        direction: 'none',
+        random: true,
+        straight: false,
+        out_mode: 'out',
+        bounce: false
+      },
+
+      // No connecting lines — purely clean motes
+      line_linked: { enable: false }
+    },
+
+    // No click/hover interactivity — purely ambient
+    interactivity: {
+      events: {
+        onhover: { enable: false },
+        onclick: { enable: false }
       }
-    }
+    },
+
+    retina_detect: true
   });
 })();
