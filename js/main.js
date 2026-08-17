@@ -65,3 +65,47 @@ window.setTimeout(function () {
   window.addEventListener('resize', onScroll);
   update();
 })();
+
+// Ambient liquid gradient backdrop (Granim.js - cdnjs.cloudflare.com)
+// Kept within the site's own lavender/purple palette so it reads as
+// "the page breathing," not a mismatched color overlay.
+(function () {
+  var canvas = document.getElementById('granim-canvas');
+  if (!canvas) return;
+  if (typeof Granim === 'undefined') {
+    console.warn('Granim.js failed to load from the CDN — ambient gradient skipped.');
+    return;
+  }
+  var reduceMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if (reduceMotion) {
+    console.info('Ambient gradient skipped: prefers-reduced-motion is on.');
+    return;
+  }
+
+  // Set the actual drawing-buffer resolution — without this the canvas
+  // defaults to 300x150px internally and gets blurrily stretched by CSS.
+  function sizeCanvas() {
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+  }
+  sizeCanvas();
+  window.addEventListener('resize', sizeCanvas);
+
+  new Granim({
+    element: '#granim-canvas',
+    direction: 'diagonal',
+    isPausedWhenNotInView: true,
+    states: {
+      'default-state': {
+        gradients: [
+          ['#E4E0F7', '#8479B8'],
+          ['#C6BFEC', '#6C5FA5'],
+          ['#D9CFF0', '#4C4178'],
+          ['#8479B8', '#C6BFEC']
+        ],
+        transitionSpeed: 4500,
+        loop: true
+      }
+    }
+  });
+})();

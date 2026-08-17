@@ -16,6 +16,8 @@
 
 <body>
 
+  <canvas id="granim-canvas" aria-hidden="true"></canvas>
+
   <header class="nav">
     <div class="nav-inner">
       <div class="brand">Maeda <small>漂亮人生</small></div>
@@ -162,7 +164,9 @@
         <p>Every wash, cut and color runs on organic product. Nothing's booked out weeks in advance — you walk in, take
           a seat, and get seen.</p>
       </div>
-      <div class="corner-mark" data-aos="fade-left" data-aos-delay="100"></div>
+      <div class="corner-mark" data-aos="fade-left" data-aos-delay="100">
+        <div class="img-layer"></div>
+      </div>
     </div>
   </section>
 
@@ -175,11 +179,13 @@
       </div>
       <div class="bento-grid">
         <div class="bento-item large" data-aos="fade-right">
-          <img src="images/salon-wall.jpg" alt="Long dark hair with balayage in front of Maeda's product and extension wall" loading="lazy">
+          <img src="images/salon-wall.jpg"
+            alt="Long dark hair with balayage in front of Maeda's product and extension wall" loading="lazy">
           <span class="cap">Fresh color, in-salon</span>
         </div>
         <div class="bento-item" data-aos="fade-up" data-aos-delay="80">
-          <img src="images/extension-install.jpg" alt="Close-up of hair extensions being clipped in at Maeda Hair Salon" loading="lazy">
+          <img src="images/extension-install.jpg" alt="Close-up of hair extensions being clipped in at Maeda Hair Salon"
+            loading="lazy">
           <span class="cap">Extension install</span>
         </div>
         <div class="bento-item" data-aos="fade-up" data-aos-delay="140">
@@ -366,6 +372,7 @@
 
 
   <script src="https://unpkg.com/aos@2.3.4/dist/aos.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/granim/2.0.0/granim.min.js"></script>
   <script src="js/main.js"></script>
 </body>
 
