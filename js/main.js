@@ -77,80 +77,93 @@ document.addEventListener('DOMContentLoaded', function () {
 // Hyper-delicate dust motes drifting slowly in sunlight.
 // Vibe: organic wellness, botanical texture, clean and high-end.
 (function () {
-  var reduceMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-  if (reduceMotion) return;
+  // NOTE: we intentionally do NOT skip on prefers-reduced-motion here.
+  // Static-ish floating dots at very low speed are not "motion" in the
+  // accessibility sense, and skipping them leaves the background blank on
+  // most iPhones which have Reduce Motion on by default.
+  // The parallax and AOS animations (real motion) are still gated separately.
 
-  if (typeof tsParticles === 'undefined') {
-    console.warn('tsParticles failed to load from the CDN — ambient particles skipped.');
-    return;
+  var reduceMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  function startParticles() {
+    if (typeof tsParticles === 'undefined') return false;
+
+    tsParticles.load('tsparticles', {
+      background: { color: { value: 'transparent' } },
+
+      // Cap FPS lower on mobile to save battery
+      fpsLimit: reduceMotion ? 20 : 40,
+
+      particles: {
+        number: {
+          value: 100,
+          density: { enable: true, value_area: 900 }
+        },
+
+        // Brand palette: purples lifted from --rose / --gold-deep / --sand
+        color: {
+          value: ['#8479B8', '#6C5FA5', '#4C4178', '#C6BFEC', '#a49ac8']
+        },
+
+        shape: { type: 'circle' },
+
+        opacity: {
+          // Raised max to 0.55 so particles are visible on 2x/3x Retina screens
+          value: 0.55,
+          random: true,
+          anim: {
+            enable: !reduceMotion,
+            speed: 0.3,
+            opacity_min: 0.12,
+            sync: false
+          }
+        },
+
+        size: {
+          // Raised to 4px base — at 3x DPI a 3px logical px is only 1 physical px
+          value: 4,
+          random: true,
+          anim: {
+            enable: !reduceMotion,
+            speed: 0.4,
+            size_min: 1,
+            sync: false
+          }
+        },
+
+        move: {
+          enable: !reduceMotion,   // completely still if OS says reduce motion
+          speed: 0.3,
+          direction: 'none',
+          random: true,
+          straight: false,
+          out_mode: 'out',
+          bounce: false
+        },
+
+        line_linked: { enable: false }
+      },
+
+      interactivity: {
+        events: {
+          onhover: { enable: false },
+          onclick: { enable: false }
+        }
+      },
+
+      // Disabled — retina_detect doubles the particle count on Retina and
+      // makes them tiny again, undoing our size increase
+      retina_detect: false
+    });
+
+    return true;
   }
 
-  // v2 API: tsParticles.load("elementId", options)
-  tsParticles.load('tsparticles', {
-    // Transparent background — the page's own --cream CSS var shows through
-    background: { color: { value: 'transparent' } },
-
-    fpsLimit: 40,
-
-    particles: {
-      number: {
-        value: 110,
-        density: { enable: true, value_area: 1100 }
-      },
-
-      // Colour palette: soft purples & warm neutrals lifted from the brand
-      color: {
-        value: ['#8479B8', '#6C5FA5', '#4C4178', '#C6BFEC', '#a49ac8']
-      },
-
-      // Round dust motes — vary in size for depth
-      shape: { type: 'circle' },
-
-      opacity: {
-        value: 0.35,
-        random: true,
-        anim: {
-          enable: true,
-          speed: 0.35,
-          opacity_min: 0.05,
-          sync: false
-        }
-      },
-
-      size: {
-        value: 3,
-        random: true,
-        anim: {
-          enable: true,
-          speed: 0.5,
-          size_min: 0.6,
-          sync: false
-        }
-      },
-
-      // Very slow, organic drift — no strong direction
-      move: {
-        enable: true,
-        speed: 0.28,
-        direction: 'none',
-        random: true,
-        straight: false,
-        out_mode: 'out',
-        bounce: false
-      },
-
-      // No connecting lines — purely clean motes
-      line_linked: { enable: false }
-    },
-
-    // No click/hover interactivity — purely ambient
-    interactivity: {
-      events: {
-        onhover: { enable: false },
-        onclick: { enable: false }
-      }
-    },
-
-    retina_detect: true
-  });
+  // Try immediately (scripts are synchronous so this usually works on desktop)
+  if (!startParticles()) {
+    // CDN was slow (common on mobile) — retry once the full page has loaded
+    window.addEventListener('load', function () {
+      startParticles();
+    });
+  }
 })();
